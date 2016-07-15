@@ -24,10 +24,16 @@ collect news
 post a comment  
 
 # snapshot
-![](snapshot/news_list.png)  
-![](snapshot/news_detail.png)  
-![](snapshot/user_login.png)  
-![](snapshot/user_register.png)  
-![](snapshot/post_comment.png)  
-![](snapshot/collect_news.png)  
-![](snapshot/news_collection.png)      
+![](snapshot/news_list.png =350)  
+  
+![](snapshot/news_detail.png =350)  
+  
+![](snapshot/user_login.png =350)  
+  
+![](snapshot/user_register.png =350)  
+  
+![](snapshot/post_comment.png =350)  
+  
+![](snapshot/collect_news.png =350)  
+  
+![](snapshot/news_collection.png =350)        
