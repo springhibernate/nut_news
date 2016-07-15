@@ -24,16 +24,16 @@ collect news
 post a comment  
 
 # snapshot
-![](snapshot/news_list.png =350)  
+<img src="snapshot/news_list.png" width = "350px" />  
   
-![](snapshot/news_detail.png =350)  
+<img src="snapshot/news_detail.png" width = "350px" />   
   
-![](snapshot/user_login.png =350)  
+<img src="snapshot/user_login.png" width = "350px" />   
   
-![](snapshot/user_register.png =350)  
+<img src="snapshot/user_register.png" width = "350px" />   
   
-![](snapshot/post_comment.png =350)  
+<img src="snapshot/post_comment.png" width = "350px" />   
   
-![](snapshot/collect_news.png =350)  
+<img src="snapshot/collect_news.png" width = "350px" />   
   
-![](snapshot/news_collection.png =350)        
+<img src="snapshot/news_collection.png" width = "350px" />         
