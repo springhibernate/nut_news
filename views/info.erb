@@ -1,0 +1,543 @@
+﻿<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+	<title>info</title>
+	<link href="/js/ionic/css/ionic.min.css" rel="stylesheet">
+	<script src="/js/ionic/js/ionic.bundle.min.js"></script>
+	<style type="text/css">
+	   #interval
+	   {
+	        margin-left:10px;
+	   }
+        .info-title {
+            height:auto;
+            overflow:visible; 
+            white-space:normal;
+        }
+        .info-detail {
+            margin-left:10px;
+            margin-right:10px;
+        }
+        .info-picture {
+            text-align:center;
+        }
+        .info-picture img {
+            width:80%;
+            margin:auto;
+            margin-bottom:10px;
+        }
+        .item-buttom {
+            margin-top:10px;
+            text-align:center;
+        }
+	</style>
+</head>
+<body ng-app="starter">
+	<ion-nav-bar class="bar-positive">
+		<ion-nav-back-button class="button-clear"></ion-nav-back-button>
+	</ion-nav-bar>
+	<ion-nav-view>	
+	</ion-nav-view>
+
+	<script id="home.html" type="text/ng-template">
+	<ion-view title="Nut News">
+	    <ion-nav-buttons side="right">
+            <button class="button button-clear ion-more" ng-click="show_more($event);"></button>
+        </ion-nav-buttons>
+		<ion-content>
+			<div class="list">
+			    <div class="item item-thumbnail-left" ng-repeat="info in infoList" ng-click="toDetail({{info.id}});">
+			        <img ng-src="{{info.picture}}"/>
+                    <div class="info-title h4">{{info.title}}</div>
+			        <p><span class="{{info.cat_color}}">{{info.cat_name}}</span><span id="interval"/><span>{{info.create_time}}</span></p>
+			    </div>	
+			    <ion-infinite-scroll on-infinite="getInfoList()" ng-if="total > page" immediate-check="false"></ion-infinite-scroll>		
+			</div>
+		</ion-content>
+	</ion-view>
+	</script>
+    <script id="menu.html" type="text/ng-template">
+        <ion-popover-view>
+            <ion-header-bar>
+                <h1 class="title">Menu</h1>
+            </ion-header-bar>
+            <ion-content>
+                <div class="list">
+                    <div class="item" ng-click="show_login();">
+                        Mine
+                    </div>
+                    <div class="item" ng-click="show_collection();">
+                        Collection
+                    </div>
+                    <div class="item" ng-click="menu_close();">
+                        Close
+                    </div>
+                </div>
+            </ion-content>
+        </ion-popover-view>
+    </script>
+	<script id="detail.html" type="text/ng-template">
+	<ion-view title="News Detail">
+		<ion-content>
+            <div class="info-detail">
+                <div class="h4">{{info.title}}</div>
+                <p><span>{{info.create_time}}</span><span id="interval" /><span>{{info.author}}</span><span id="interval" /><i class="icon ion-person"></i><span id="interval" /><span>{{info.read_count}}</span></p>
+                <div class="info-picture">
+                    <img ng-src="{{info.picture}}" />
+                </div>
+                <div ng-bind-html="info.content"></div>
+            </div>
+
+            <div class="list card" ng-repeat="c in commentList">
+                <div class="item">
+                    <div>{{c.content}}</div>
+                    <p><span>{{c.user_name}}</span><span id="interval" /><span>{{c.create_time}}</span></p>
+                </div>
+                <ion-infinite-scroll on-infinite="getCommentList()" ng-if="total > page" immediate-check="false"></ion-infinite-scroll>
+            </div>
+		</ion-content>
+        <ion-footer-bar>
+            <button class="button icon-left ion-chatbubble" ng-click="comment(info.id)"></button>
+            <button class="{{collect_class}}" ng-click="collect(info.id)"></button>
+        </ion-footer-bar>
+	</ion-view>
+	</script>
+    <script id="collection.html" type="text/ng-template">
+        <ion-view title="My Collection">
+            <ion-content>
+                <div class="list">
+                    <div class="item" ng-repeat="c in collectionList" ng-click="toDetail({{c.info_id}});">
+                        <div class="info-title h4">{{c.title}}</div>
+                    </div>
+                    <ion-infinite-scroll on-infinite="getCollectoinList()" ng-if="total > page" immediate-check="false"></ion-infinite-scroll>
+                </div>
+            </ion-content>
+        </ion-view>
+    </script>
+    <script id="login.html" type="text/ng-template">
+        <ion-modal-view>
+            <ion-header-bar class="bar-positive">
+                <h1 class="title">User</h1>
+            </ion-header-bar>
+            <ion-content>
+                <div class="list" ng-show="show_which(0)">
+                    <div class="item">
+                        <h1>{{user.name}},welcome to Nut News !</h1>
+                    </div>
+                    <div class="item-buttom">
+                        <button class="button button-positive" ng-click="user_logout();">Logout</button>
+                        <a class="button button-positive button-clear" ng-click="back()">Close</a>
+                    </div>
+                </div>
+                <div class="list" ng-show="show_which(1)">
+                    <label class="item item-input">
+                        <input type="text" placeholder="Name" ng-model="user.name" />
+                    </label>
+                    <label class="item item-input">
+                        <input type="text" placeholder="Password" ng-model="user.password" />
+                    </label>
+                    <div class="item-buttom">
+                        <button class="button button-positive" ng-click="user_login();">Login</button>
+                        <a class="button button-positive button-clear" ng-click="to_register()">Register</a>
+                        <a class="button button-positive button-clear" ng-click="back()">Close</a>
+                    </div>
+                </div>
+                <div class="list" ng-show="show_which(2)">
+                    <label class="item item-input">
+                        <input type="text" placeholder="Name" ng-model="user.name" />
+                    </label>
+                    <label class="item item-input">
+                        <input type="text" placeholder="Password" ng-model="user.password" />
+                    </label>
+                    <label class="item item-input">
+                        <input type="text" placeholder="Password Confirm" ng-model="user.password_confirmed" />
+                    </label>
+                    <div class="item-buttom">
+                        <button class="button button-positive" ng-click="user_register();">Register</button>
+                        <a class="button button-positive button-clear" ng-click="to_login()">Login</a>
+                        <a class="button button-positive button-clear" ng-click="back()">Close</a>
+                    </div>
+                </div>
+            </ion-content>
+        </ion-modal-view>
+    </script>
+</body>
+</html>
+<script type="text/javascript">
+var app = angular.module("starter", ["ionic","ngSanitize"], function ($httpProvider) {
+    // Use x-www-form-urlencoded Content-Type
+    $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+
+    /**
+        * The workhorse; converts an object to x-www-form-urlencoded serialization.
+        * @param {Object} obj
+        * @return {String}
+        */
+    var param = function (obj) {
+        var query = '', name, value, fullSubName, subName, subValue, innerObj, i;
+
+        for (name in obj) {
+            value = obj[name];
+
+            if (value instanceof Array) {
+                for (i = 0; i < value.length; ++i) {
+                    subValue = value[i];
+                    fullSubName = name + '[' + i + ']';
+                    innerObj = {};
+                    innerObj[fullSubName] = subValue;
+                    query += param(innerObj) + '&';
+                }
+            }
+            else if (value instanceof Object) {
+                for (subName in value) {
+                    subValue = value[subName];
+                    fullSubName = name + '[' + subName + ']';
+                    innerObj = {};
+                    innerObj[fullSubName] = subValue;
+                    query += param(innerObj) + '&';
+                }
+            }
+            else if (value !== undefined && value !== null)
+                query += encodeURIComponent(name) + '=' + encodeURIComponent(value) + '&';
+        }
+
+        return query.length ? query.substr(0, query.length - 1) : query;
+    };
+
+    // Override $http service's default transformRequest
+    $httpProvider.defaults.transformRequest = [function (data) {
+        return angular.isObject(data) && String(data) !== '[object File]' ? param(data) : data;
+    }];
+});
+app.run(function($ionicPlatform){
+	$ionicPlatform.ready(function(){
+		if(window.cordova && window.cordova.plugins.Keyboard){
+			cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+		}
+		if(window.StatusBar){
+			StatusBar.styleDefault();
+		}
+	});
+});
+app.factory('Tools', function ($http,$ionicLoading) {
+    var obj = {};
+    obj.trim = function (str) {
+        String.prototype.trim = function () {
+            return this.replace(/(^\s*)|(\s*$)/g, "");
+        }
+        return str.trim();
+    }
+    obj.is_blank = function (str) {
+        String.prototype.trim = function () {
+            return this.replace(/(^\s*)|(\s*$)/g, "");
+        }
+        str=str.trim();
+        if (str == '' || str.length == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+    obj.toast = function (message) {
+        $ionicLoading.show({
+            template: message,
+            duration: 800
+        });
+    };
+    obj.logined = function (yesCallback, noCallback) {
+        $http.get("/info/logined").success(function (response) {
+            if (response.status == 1) {
+                yesCallback();
+            } else {
+                noCallback();
+            }
+        });
+    };
+    return obj;
+});
+app.config(function($stateProvider,$urlRouterProvider){
+	$stateProvider.state("home",{
+		url:"/home/:login",
+		templateUrl:"home.html",
+		controller: "HomeController"
+	}).state("detail",{
+		url:"/detail/:id",
+		templateUrl:"detail.html",
+		controller:"DetailController"
+	}).state("collection", {
+	    url: "/collection",
+	    templateUrl: "collection.html",
+	    controller: "CollectionController"
+	});
+	$urlRouterProvider.otherwise("/home/0");
+});
+app.controller('HomeController', function ($scope, $http, $state, $stateParams, $ionicActionSheet, $ionicPopover, $ionicModal, $ionicLoading, Tools) {
+    $scope.page = 0;
+    $scope.total = 1;
+    $scope.infoList = [];
+    $scope.getInfoList=function(){
+        $scope.page++;
+        $http.get("/info/list?page="+$scope.page).success(function (response) {
+            angular.forEach(response.dataList,function(data){
+                $scope.infoList.push(data);    
+            });
+            $scope.total=response.totalPages;
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+	    }).error(function (err) {
+          $scope.$broadcast('scroll.infiniteScrollComplete');
+          console.log(err);
+	    });
+    };
+    $scope.getInfoList();
+   
+	$scope.toDetail=function(id){
+	    $state.go("detail", { id:id }, { reload: true });
+	};
+	$scope.show_modal=function(){
+        $http.get("/info/logined").success(function (response) {
+            $scope.user = { name: '', password: '', password_confirmed: '' }
+            if (response.status == 1) {
+                $scope.which = 0;
+                $scope.user.name = response.message;
+            } else {
+                $scope.which = 1;
+            }
+            $scope.modal.show();
+        });
+	};
+
+	$scope.popover = $ionicPopover.fromTemplateUrl("menu.html", {
+	    scope: $scope
+	}).then(function (popover) {
+	    $scope.popover = popover;
+	});
+	$scope.show_more = function ($event) {
+	    $scope.popover.show($event);
+	};
+	$scope.show_login = function () {
+	    $scope.show_modal();
+	    $scope.popover.hide();
+	};
+	$scope.show_collection = function () {
+	    Tools.logined(function () {
+	        $state.go("collection", {}, { reload: true });
+	    }, function () {
+	        Tools.toast("Login first");
+	        $scope.show_modal();
+	    });
+	    $scope.popover.hide();
+	};
+	$scope.menu_close = function () {
+	    $scope.popover.hide();
+	};
+	$scope.$on("$destroy", function () {
+	    $scope.popover.remove();
+	});
+
+	$ionicModal.fromTemplateUrl("login.html", {
+	    scope: $scope,
+	    animation: 'slide-in-up'
+	}).then(function (modal) {
+	    $scope.modal = modal;
+	});
+	$scope.add_user = function () {
+	    $scope.userList.push($scope.user);
+	    $scope.modal.hide();
+	};
+	$scope.$on("$destroy", function () {
+	    $scope.modal.remove();
+	});
+	$scope.show_which = function (from) {
+	    return $scope.which == from;
+	};
+	$scope.to_register = function () {
+	    $scope.which = 2;
+	};
+	$scope.to_login = function () {
+	    $scope.which = 1;
+	};
+	$scope.back = function () {
+	    $scope.modal.hide();
+	};
+	$scope.toast = function (message) {
+	    $ionicLoading.show({
+	        template:message,
+	        duration: 800
+	    });
+	};
+	$scope.user_login = function () {
+	    if (Tools.is_blank($scope.user.name)) {
+	        $scope.toast('Name is required');
+	        return;
+	    }
+	    if (Tools.is_blank($scope.user.password)) {
+	        $scope.toast('Password is required');
+	        return;
+	    }
+	    
+	    $http.post("/info/login", {name:$scope.user.name,password:$scope.user.password}).success(function (response) {
+	        if (response.status == 1) {
+	            $scope.toast(response.message);
+	            $scope.modal.hide();
+	        } else {
+	            $scope.toast(response.message);
+	        }
+	    });
+	};
+	$scope.user_register = function () {
+	    if (Tools.is_blank($scope.user.name)) {
+	        $scope.toast('Name is required');
+	        return;
+	    }
+	    if (Tools.is_blank($scope.user.password)) {
+	        $scope.toast('Password is required');
+	        return;
+	    }
+	    if (Tools.is_blank($scope.user.password_confirmed)) {
+	        $scope.toast('Password Confirm is required');
+	        return;
+	    }
+	    if ($scope.user.password != $scope.user.password_confirmed) {
+	        $scope.toast('Password Confirm not equal Password');
+	        return;
+	    }
+	    $http.post("/info/register", { name: $scope.user.name, password: $scope.user.password }).success(function (response) {
+	        if (response.status == 1) {
+	            $scope.toast(response.message);
+	            $scope.modal.hide();
+	        } else {
+	            $scope.toast(response.message);
+	        }
+	    });
+	};
+	$scope.user_logout = function () {
+	    $http.get("/info/logout").success(function (response) {
+	        $scope.toast(response.message);
+	        $scope.modal.hide();
+	    }).error(function (err) {
+	        console.log(err);
+	    });
+	};
+	var login = $stateParams['login'];
+	console.log(login);
+	if (login == 1) {
+	    $scope.show_modal();
+	}
+});
+app.controller('DetailController', function ($scope, $http, $state, $location, $stateParams, $ionicLoading, $ionicModal, $ionicPopup, Tools) {
+    //var id=$location.search()['id'];
+    var id= $stateParams['id'];
+
+    $scope.page = 0;
+    $scope.total = 1;
+    $scope.commentList = [];
+    $scope.getCommentList = function () {
+        $scope.page++;
+        $http.get("/info/comment_list?info_id=" + id + "&page=" + $scope.page).success(function (response) {
+            angular.forEach(response.dataList, function (data) {
+                $scope.commentList.push(data);
+            });
+            $scope.total = response.totalPages;
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+        }).error(function (err) {
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+            console.log(err);
+        });
+    };
+    
+    $scope.collect_class = "button icon-right ion-android-favorite-outline";
+    $scope.getCollectClass = function () {
+        $http.get("/info/collected?info_id=" + id).success(function (response) {
+            if (response.status == 1) {
+                $scope.collect_class = "button icon-right ion-android-favorite";
+            }
+        });
+    };
+
+    $ionicLoading.show();
+    $http.get("/info/detail?id="+id).success(function (data) {
+        $scope.info = data;
+        $ionicLoading.hide();
+        $scope.getCollectClass();
+        $scope.getCommentList();
+    }).error(function (err) {
+        $ionicLoading.hide();
+        console.log(err);
+    });
+
+    $scope.comment = function (id) {
+        Tools.logined(function () {
+            $scope.new_comment();
+        }, function () {
+            Tools.toast("Login first");
+            $state.go("home", { login: 1 }, { reload: true });
+        });
+    };
+    //TODO 第二次打开有bug
+    $scope.new_comment = function () {
+        $scope.comment = { content: '' };
+        $ionicPopup.show({
+            title: "input your comment",
+            template: "<textarea ng-model='comment.content' placeholder='comment' style='height:50px;'></textarea>",
+            scope: $scope,
+            buttons: [
+                { text: "cancel" },
+                {
+                    text: "submit",
+                    onTap: function (e) {
+                        if (Tools.is_blank($scope.comment.content)) {
+                            Tools.toast("input your comment");
+                            e.preventDefault();
+                        } else {
+                            $http.post("/info/comment_save", { info_id: id, content: $scope.comment.content }).success(function (response) {
+                                Tools.toast(response.message);
+                            });
+                            return $scope.comment.content;
+                        }
+                    }
+                }]
+        }).then(function (res) {
+            console.log("you comment is:" + res);
+        });
+    };
+
+    $scope.collect = function (id) {
+        $http.get("/info/collect?info_id=" + id).success(function (response) {
+            if (response.status == 0) {
+                Tools.toast(response.message);
+                $state.go("home", { login: 1 }, { reload: true });
+            } else {
+                Tools.toast(response.message);
+                $scope.collect_class = "button icon-right ion-android-favorite";
+            }
+        }).error(function (err) {
+            console.log(err);
+        });
+    };
+});
+app.controller('CollectionController', function ($scope, $http, $state, $ionicActionSheet, $ionicModal, $ionicLoading, Tools) {
+    $scope.page = 0;
+    $scope.total = 1;
+    $scope.collectionList = [];
+    
+    $scope.getCollectionList = function () {
+        $scope.page++;
+        $http.get("/info/collection?page=" + $scope.page).success(function (response) {
+            angular.forEach(response.dataList, function (data) {
+                $scope.collectionList.push(data);
+            });
+            $scope.total = response.totalPages;
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+        }).error(function (err) {
+            $scope.$broadcast('scroll.infiniteScrollComplete');
+            console.log(err);
+        });
+    };
+    $scope.getCollectionList();
+
+    $scope.toDetail = function (id) {
+        $state.go("detail", { id: id }, { reload: true });
+    };
+});
+</script>

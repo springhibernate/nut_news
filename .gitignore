@@ -1,0 +1,6 @@
+hello/
+*.txt
+test.rb
+test*.rb
+test_*.rb
+db
