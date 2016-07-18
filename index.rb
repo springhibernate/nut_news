@@ -23,31 +23,38 @@ before do
 	content_type :json, 'charset' => 'utf-8' if request.path_info.start_with?("/info/")
 end
 
+def resp(dict)
+	return [200,{"Access-Control-Allow-Origin"=>"*","Access-Control-Allow-Methods"=>"GET","Access-Control-Allow-Headers"=>"x-requested-with,content-type"},dict.to_json]
+end
+
 get '/' do 
 	erb :info
 end
 
 get '/info/list' do
 	dataList,totalPages=Info.new.paginate(params['page'])
-	{:dataList=>dataList,:totalPages=>totalPages}.to_json
+	res={:dataList=>dataList,:totalPages=>totalPages}
+	resp res
 end
 
 get '/info/detail' do 
 	id = params['id']
 	data=Info.new.detail(id)
-    data.to_json
+    resp data
 end
 
 get '/info/comment_list' do 
 	info_id = params['info_id']
 	dataList,totalPages=Comment.new.paginate(params['page'],info_id)
-	{:dataList=>dataList,:totalPages=>totalPages}.to_json
+	res={:dataList=>dataList,:totalPages=>totalPages}
+	resp res
 end
 
 get '/info/collection' do 
 	user_id = session['user_id']
 	dataList,totalPages=Collect.new.paginate(params['page'],user_id)
-	{:dataList=>dataList,:totalPages=>totalPages}.to_json
+	res={:dataList=>dataList,:totalPages=>totalPages}
+	resp res
 end
 
 get '/info/collect' do 
@@ -62,7 +69,7 @@ get '/info/collect' do
 		res[:status] = 1
 		res[:message] = "Collect successfully"
 	end
-	res.to_json
+	resp res
 end
 
 get '/info/collected' do 
@@ -78,7 +85,7 @@ get '/info/collected' do
 			res[:status] = 1
 		end
 	end
-	res.to_json
+	resp res
 end
 
 get '/info/logined' do 
@@ -89,7 +96,7 @@ get '/info/logined' do
 		res[:status] = 1
 		res[:message] = session["user_name"]
 	end
-	res.to_json
+	resp res
 end
 
 post '/info/login' do 
@@ -111,7 +118,7 @@ post '/info/login' do
 		session["user_id"] = data["id"]
 		session["user_name"] = data["user_name"]
 	end
-	res.to_json
+	resp res
 end
 
 get '/info/logout' do 
@@ -120,7 +127,7 @@ get '/info/logout' do
     res={}
 	res[:status] = 0
 	res[:message] = "Logout successfully"
-    res.to_json
+    resp res
 end
 
 post '/info/register' do 
@@ -139,7 +146,7 @@ post '/info/register' do
 		res[:status] = 0
 		res[:message] = "the Name already use,try others"
 	end
-	res.to_json
+	resp res
 end
 
 post '/info/comment_save' do 
@@ -150,5 +157,5 @@ post '/info/comment_save' do
 	Comment.new.save(info_id, user_id,content)
 	res[:status] = 1
 	res[:message] = "comment successfully"
-	res.to_json
+	resp res
 end

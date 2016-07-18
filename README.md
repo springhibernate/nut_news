@@ -24,6 +24,8 @@ collect news
 post a comment  
 
 # snapshot
+<img src="snapshot/nut_news_app.png" width = "350px" />  
+
 <img src="snapshot/news_list.png" width = "350px" />  
   
 <img src="snapshot/news_detail.png" width = "350px" />   
@@ -37,3 +39,7 @@ post a comment
 <img src="snapshot/collect_news.png" width = "350px" />   
   
 <img src="snapshot/news_collection.png" width = "350px" />         
+
+# todo
+remeber password  
+split js to a independent file  

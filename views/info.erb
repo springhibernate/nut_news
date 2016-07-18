@@ -246,7 +246,7 @@ app.factory('Tools', function ($http,$ionicLoading) {
         });
     };
     obj.logined = function (yesCallback, noCallback) {
-        $http.get("/info/logined").success(function (response) {
+        $http.get(obj.domain+"/info/logined").success(function (response) {
             if (response.status == 1) {
                 yesCallback();
             } else {
@@ -254,6 +254,7 @@ app.factory('Tools', function ($http,$ionicLoading) {
             }
         });
     };
+    obj.domain="";
     return obj;
 });
 app.config(function($stateProvider,$urlRouterProvider){
@@ -278,7 +279,7 @@ app.controller('HomeController', function ($scope, $http, $state, $stateParams, 
     $scope.infoList = [];
     $scope.getInfoList=function(){
         $scope.page++;
-        $http.get("/info/list?page="+$scope.page).success(function (response) {
+        $http.get(Tools.domain+"/info/list?page="+$scope.page).success(function (response) {
             angular.forEach(response.dataList,function(data){
                 $scope.infoList.push(data);    
             });
@@ -295,7 +296,7 @@ app.controller('HomeController', function ($scope, $http, $state, $stateParams, 
 	    $state.go("detail", { id:id }, { reload: true });
 	};
 	$scope.show_modal=function(){
-        $http.get("/info/logined").success(function (response) {
+        $http.get(Tools.domain+"/info/logined").success(function (response) {
             $scope.user = { name: '', password: '', password_confirmed: '' }
             if (response.status == 1) {
                 $scope.which = 0;
@@ -376,7 +377,7 @@ app.controller('HomeController', function ($scope, $http, $state, $stateParams, 
 	        return;
 	    }
 	    
-	    $http.post("/info/login", {name:$scope.user.name,password:$scope.user.password}).success(function (response) {
+	    $http.post(Tools.domain+"/info/login", {name:$scope.user.name,password:$scope.user.password}).success(function (response) {
 	        if (response.status == 1) {
 	            $scope.toast(response.message);
 	            $scope.modal.hide();
@@ -402,7 +403,7 @@ app.controller('HomeController', function ($scope, $http, $state, $stateParams, 
 	        $scope.toast('Password Confirm not equal Password');
 	        return;
 	    }
-	    $http.post("/info/register", { name: $scope.user.name, password: $scope.user.password }).success(function (response) {
+	    $http.post(Tools.domain+"/info/register", { name: $scope.user.name, password: $scope.user.password }).success(function (response) {
 	        if (response.status == 1) {
 	            $scope.toast(response.message);
 	            $scope.modal.hide();
@@ -412,7 +413,7 @@ app.controller('HomeController', function ($scope, $http, $state, $stateParams, 
 	    });
 	};
 	$scope.user_logout = function () {
-	    $http.get("/info/logout").success(function (response) {
+	    $http.get(Tools.domain+"/info/logout").success(function (response) {
 	        $scope.toast(response.message);
 	        $scope.modal.hide();
 	    }).error(function (err) {
@@ -434,7 +435,7 @@ app.controller('DetailController', function ($scope, $http, $state, $location, $
     $scope.commentList = [];
     $scope.getCommentList = function () {
         $scope.page++;
-        $http.get("/info/comment_list?info_id=" + id + "&page=" + $scope.page).success(function (response) {
+        $http.get(Tools.domain+"/info/comment_list?info_id=" + id + "&page=" + $scope.page).success(function (response) {
             angular.forEach(response.dataList, function (data) {
                 $scope.commentList.push(data);
             });
@@ -448,7 +449,7 @@ app.controller('DetailController', function ($scope, $http, $state, $location, $
     
     $scope.collect_class = "button icon-right ion-android-favorite-outline";
     $scope.getCollectClass = function () {
-        $http.get("/info/collected?info_id=" + id).success(function (response) {
+        $http.get(Tools.domain+"/info/collected?info_id=" + id).success(function (response) {
             if (response.status == 1) {
                 $scope.collect_class = "button icon-right ion-android-favorite";
             }
@@ -456,7 +457,7 @@ app.controller('DetailController', function ($scope, $http, $state, $location, $
     };
 
     $ionicLoading.show();
-    $http.get("/info/detail?id="+id).success(function (data) {
+    $http.get(Tools.domain+"/info/detail?id="+id).success(function (data) {
         $scope.info = data;
         $ionicLoading.hide();
         $scope.getCollectClass();
@@ -490,7 +491,7 @@ app.controller('DetailController', function ($scope, $http, $state, $location, $
                             Tools.toast("input your comment");
                             e.preventDefault();
                         } else {
-                            $http.post("/info/comment_save", { info_id: id, content: $scope.comment.content }).success(function (response) {
+                            $http.post(Tools.domain+"/info/comment_save", { info_id: id, content: $scope.comment.content }).success(function (response) {
                                 Tools.toast(response.message);
                             });
                             return $scope.comment.content;
@@ -503,7 +504,7 @@ app.controller('DetailController', function ($scope, $http, $state, $location, $
     };
 
     $scope.collect = function (id) {
-        $http.get("/info/collect?info_id=" + id).success(function (response) {
+        $http.get(Tools.domain+"/info/collect?info_id=" + id).success(function (response) {
             if (response.status == 0) {
                 Tools.toast(response.message);
                 $state.go("home", { login: 1 }, { reload: true });
@@ -523,7 +524,7 @@ app.controller('CollectionController', function ($scope, $http, $state, $ionicAc
     
     $scope.getCollectionList = function () {
         $scope.page++;
-        $http.get("/info/collection?page=" + $scope.page).success(function (response) {
+        $http.get(Tools.domain+"/info/collection?page=" + $scope.page).success(function (response) {
             angular.forEach(response.dataList, function (data) {
                 $scope.collectionList.push(data);
             });
